@@ -1,3 +1,27 @@
 spring:
   application:
     name: templebar.api
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/events_api
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+    open-in-view: false
+
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+
+server:
+  servlet:
+    session:
+      persistent: false
