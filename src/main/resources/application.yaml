@@ -1,12 +1,8 @@
 spring:
-  application:
-    name: templebar.api
-
-spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/events_api
-    username: postgres
-    password: postgres
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     hibernate:
@@ -27,4 +23,9 @@ server:
       persistent: false
 
 jwt:
-  secret: your-super-secret-key-with-at-least-32-characters
+  secret: ${JWT_SECRET}
+
+logging:
+  level:
+    org.springframework.security: INFO
+    org.hibernate.SQL: INFO

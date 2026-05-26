@@ -33,8 +33,12 @@
             export JAVA_HOME=${jdk}
             export PATH="${jdk}/bin:$PATH"
             export GRADLE_OPTS="-Dorg.gradle.java.home=${jdk}"
-            export DATABASE_URL="jdbc:postgresql://localhost/tasks?user=postgres&password=password"
             export JDTLS_JVM_ARGS="-javaagent:${pkgs.lombok}/share/java/lombok.jar"
+
+            export DB_URL="jdbc:postgresql://localhost:5432/templebar"
+            export DB_USERNAME="postgres"
+            export DB_PASSWORD="password"
+            export JWT_SECRET="very-secret-key-with-at-least-32-characters"
 
             echo "Spring Boot Resume Builder development environment"
             echo "JDK version: ${toString javaVersion}"

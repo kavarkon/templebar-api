@@ -1,12 +1,16 @@
 package app.templebar.api.event;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import app.templebar.api.event.dto.CreateEventRequest;
 import app.templebar.api.event.dto.EventResponse;
+import app.templebar.api.event.dto.UpdateEventRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 

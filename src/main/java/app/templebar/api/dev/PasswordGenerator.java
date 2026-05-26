@@ -9,7 +9,7 @@ public class PasswordGenerator {
         BCryptPasswordEncoder encoder =
                 new BCryptPasswordEncoder();
 
-        String hash = encoder.encode("admin123");
+        String hash = encoder.encode("themostfigure26");
 
         System.out.println(hash);
     }

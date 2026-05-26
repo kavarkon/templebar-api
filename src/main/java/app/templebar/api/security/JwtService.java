@@ -1,5 +1,6 @@
 package app.templebar.api.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,9 +17,11 @@ public class JwtService {
     private final SecretKey secretKey;
 
     public JwtService(
-            @Value("${jwt.secret}") String secret) {
+            @Value("${jwt.secret}") String secret
+    ) {
         this.secretKey = Keys.hmacShaKeyFor(
-                secret.getBytes(StandardCharsets.UTF_8));
+                secret.getBytes(StandardCharsets.UTF_8)
+        );
     }
 
     public String generateToken(Long userId) {
@@ -26,7 +29,8 @@ public class JwtService {
         Date now = new Date();
 
         Date expiration = new Date(
-                now.getTime() + Duration.ofDays(7).toMillis());
+                now.getTime() + Duration.ofDays(7).toMillis()
+        );
 
         return Jwts.builder()
                 .subject(userId.toString())
@@ -38,13 +42,14 @@ public class JwtService {
 
     public Long extractUserId(String token) {
 
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+        Claims claims = Jwts.parser()
+                .verifyWith(secretKey)
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
 
         return Long.parseLong(
-                claims.getSubject());
+                claims.getSubject()
+        );
     }
 }
