@@ -2,13 +2,18 @@
   description = "templebar api";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     flake-utils.url = "github:numtide/flake-utils";
+    gradle2nix = {
+      url = "github:tadfisher/gradle2nix/v2";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
     self,
     nixpkgs,
+    gradle2nix,
     flake-utils,
   }:
     flake-utils.lib.eachDefaultSystem (
@@ -22,6 +27,7 @@
       in {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
+            gradle2nix.packages."${system}".default
             jdk
             gradle
             spring-boot-cli
@@ -29,16 +35,16 @@
             lombok
           ];
 
+          JWT_SECRET = "🐗 (RFC 7518, Section 3.2) states that keys used with HMAC-SHA algorithms MUST have a size >= 256 bits 🐗";
+
           shellHook = ''
             export JAVA_HOME=${jdk}
             export PATH="${jdk}/bin:$PATH"
             export GRADLE_OPTS="-Dorg.gradle.java.home=${jdk}"
-            export JDTLS_JVM_ARGS="-javaagent:${pkgs.lombok}/share/java/lombok.jar"
-
             export DB_URL="jdbc:postgresql://localhost:5432/templebar"
             export DB_USERNAME="postgres"
             export DB_PASSWORD="password"
-            export JWT_SECRET="very-secret-key-with-at-least-32-characters"
+            export JDTLS_JVM_ARGS="-javaagent:${pkgs.lombok}/share/java/lombok.jar"
 
             echo "Spring Boot Resume Builder development environment"
             echo "JDK version: ${toString javaVersion}"
@@ -52,25 +58,17 @@
           '';
         };
 
-        packages.default = pkgs.stdenv.mkDerivation {
+        packages.default = gradle2nix.builders.x86_64-linux.buildGradlePackage {
           pname = "spring-templebar-api";
           version = "0.1.0";
+          lockFile = ./gradle.lock;
           src = ./.;
 
-          buildInputs = with pkgs; [
-            jdk
-            gradle
-          ];
-
-          buildPhase = ''
-            export JAVA_HOME=${jdk}
-            export PATH="${jdk}/bin:$PATH"
-            ./gradlew build -x test
-          '';
+          gradleBuildFlags = [ "build" "-x" "test" ];
 
           installPhase = ''
-            mkdir -p $out/share/java
-            cp build/libs/*.jar $out/share/java/
+            mkdir -p $out/java
+            cp build/libs/*.jar $out/java/
           '';
         };
       }
