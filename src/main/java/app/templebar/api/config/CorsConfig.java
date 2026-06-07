@@ -20,8 +20,8 @@ public class CorsConfig {
         configuration.setAllowCredentials(true);
 
         configuration.setAllowedOrigins(List.of(
-                "http://localhost:5173",
-                "http://localhost:3000"
+                "http://templebar.ru",
+                "http://admin.templebar.ru"
         ));
 
         configuration.setAllowedHeaders(List.of("*"));
@@ -31,6 +31,7 @@ public class CorsConfig {
                 "POST",
                 "PATCH",
                 "DELETE"
+                "OPTIONS"
         ));
 
         UrlBasedCorsConfigurationSource source =

@@ -1,5 +1,6 @@
 package app.templebar.api.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +38,13 @@ public class SecurityConfig {
 
             .logout(AbstractHttpConfigurer::disable)
 
+            .exceptionHandling(exceptions -> exceptions
+                    .authenticationEntryPoint(
+                        (request, response, authException) ->
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                        )
+                    )
+
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
             .addFilterBefore(jwtAuthenticationFilter,UsernamePasswordAuthenticationFilter.class)
@@ -47,7 +55,7 @@ public class SecurityConfig {
                 .permitAll()
 
                 .requestMatchers("/auth/sign-out")
-                .authenticated()
+                .permitAll()
 
                 .requestMatchers(HttpMethod.GET,"/events")
                 .permitAll()
