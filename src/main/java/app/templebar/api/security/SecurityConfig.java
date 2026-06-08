@@ -55,7 +55,7 @@ public class SecurityConfig {
                 .permitAll()
 
                 .requestMatchers("/auth/sign-out")
-                .permitAll()
+                .authenticated()
 
                 .requestMatchers(HttpMethod.GET,"/events")
                 .permitAll()
