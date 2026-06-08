@@ -1,5 +1,6 @@
 package app.templebar.api.auth;
 
+import org.springframework.beans.factory.annotation.Value;
 import app.templebar.api.auth.dto.SignInRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -15,6 +16,9 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Value("${cookie.secure}")
+    private boolean cookieSecure;
+
     @PostMapping("/auth/sign-in")
     public void signIn(@Valid @RequestBody SignInRequest request, HttpServletResponse response) {
 
@@ -25,7 +29,7 @@ public class AuthController {
                         token
                 )
                 .httpOnly(true)
-                .secure(false)
+                .secure(cookieSecure)
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(60 * 60 * 24 * 7)
@@ -47,7 +51,7 @@ public class AuthController {
                         ""
                 )
                 .httpOnly(true)
-                .secure(false)
+                .secure(cookieSecure)
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(0)

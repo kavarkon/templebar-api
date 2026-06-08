@@ -1,6 +1,18 @@
 server:
   port: 8080
 
+  error:
+    include-message: never
+    include-stacktrace: never
+
+cors:
+  allowed-origins:
+    - https://templebar.ru
+    - https://admin.templebar.ru
+
+cookie:
+  secure: true
+
 logging:
   level:
     root: INFO
