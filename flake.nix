@@ -64,9 +64,13 @@
 
           gradleBuildFlags = [ "build" "-x" "test" ];
 
+          nativeBuildInputs = [ pkgs.makeWrapper ];
+
           installPhase = ''
-            mkdir -p $out/java
+            mkdir -p $out/java $out/bin
             cp build/libs/*.jar $out/java/
+            makeWrapper ${jdk}/bin/java $out/bin/templebar-api \
+              --add-flags "-jar $out/java/templebar.api-0.0.1-SNAPSHOT.jar"
           '';
         };
       }
