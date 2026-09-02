@@ -10,6 +10,9 @@ cors:
     - https://templebar.ru
     - https://admin.templebar.ru
 
+storage:
+  upload-directory: ${STORAGE_UPLOAD_DIRECTORY}
+
 cookie:
   secure: true
 

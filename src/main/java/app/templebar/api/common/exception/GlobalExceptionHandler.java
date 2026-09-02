@@ -14,9 +14,9 @@ import java.time.OffsetDateTime;
 public class GlobalExceptionHandler {
 
     private static final Logger log =
-        LoggerFactory.getLogger(
-                GlobalExceptionHandler.class
-        );
+            LoggerFactory.getLogger(
+                    GlobalExceptionHandler.class
+            );
 
     @ExceptionHandler(EventNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -25,6 +25,17 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(
                 "EVENT_NOT_FOUND",
                 "Event not found",
+                OffsetDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(FileNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleFileNotFound() {
+
+        return new ErrorResponse(
+                "FILE_NOT_FOUND",
+                "File not found",
                 OffsetDateTime.now()
         );
     }
@@ -78,24 +89,24 @@ public class GlobalExceptionHandler {
                 "VALIDATION_ERROR",
                 message,
                 OffsetDateTime.now()
-                );
+        );
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleUnexpectedError(
             Exception exception
-            ) {
+    ) {
 
         log.error(
                 "Unexpected error",
                 exception
-                );
+        );
 
         return new ErrorResponse(
                 "INTERNAL_SERVER_ERROR",
                 "Unexpected error",
                 OffsetDateTime.now()
-                );
-            }
+        );
+    }
 }

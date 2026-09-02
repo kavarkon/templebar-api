@@ -25,55 +25,76 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http
+    ) throws Exception {
 
         http
-            .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
 
-            .cors(Customizer.withDefaults())
+                .cors(Customizer.withDefaults())
 
-            .formLogin(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
 
-            .httpBasic(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
 
-            .logout(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
 
-            .exceptionHandling(exceptions -> exceptions
-                    .authenticationEntryPoint(
-                        (request, response, authException) ->
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(
+                                (request, response, authException) ->
+                                        response.sendError(
+                                                HttpServletResponse.SC_UNAUTHORIZED
+                                        )
                         )
-                    )
+                )
 
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
+                )
 
-            .addFilterBefore(jwtAuthenticationFilter,UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
 
-            .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth -> auth
 
-                .requestMatchers("/auth/sign-in")
-                .permitAll()
+                        .requestMatchers("/auth/sign-in")
+                        .permitAll()
 
-                .requestMatchers("/auth/sign-out")
-                .authenticated()
+                        .requestMatchers("/auth/sign-out")
+                        .authenticated()
 
-                .requestMatchers(HttpMethod.GET,"/events")
-                .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/events")
+                        .permitAll()
 
-                .requestMatchers(HttpMethod.POST,"/events")
-                .authenticated()
+                        .requestMatchers(HttpMethod.POST, "/events")
+                        .authenticated()
 
-                .requestMatchers(HttpMethod.PATCH,"/events/*")
-                .authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "/events/*")
+                        .authenticated()
 
-                .requestMatchers(HttpMethod.DELETE,"/events/*")
-                .authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/events/*")
+                        .authenticated()
 
-                .requestMatchers(HttpMethod.POST,"/users")
-                .authenticated()
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/files/{id}/content"
+                        )
+                        .permitAll()
 
-                .anyRequest().denyAll()
-            );
+                        .requestMatchers(HttpMethod.POST, "/files")
+                        .authenticated()
+
+                        .requestMatchers(HttpMethod.POST, "/users")
+                        .authenticated()
+
+                        .anyRequest()
+                        .denyAll()
+                );
 
         return http.build();
     }
