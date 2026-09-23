@@ -5,13 +5,16 @@ server:
     include-message: never
     include-stacktrace: never
 
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+
 cors:
   allowed-origins:
     - https://templebar.ru
     - https://admin.templebar.ru
-
-storage:
-  upload-directory: ${STORAGE_UPLOAD_DIRECTORY}
 
 cookie:
   secure: true

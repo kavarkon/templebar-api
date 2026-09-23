@@ -4,6 +4,8 @@ import app.templebar.api.common.exception.EventNotFoundException;
 import app.templebar.api.event.dto.CreateEventRequest;
 import app.templebar.api.event.dto.EventResponse;
 import app.templebar.api.event.dto.UpdateEventRequest;
+import app.templebar.api.file.File;
+import app.templebar.api.file.FileService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,24 +17,37 @@ import java.util.List;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final FileService fileService;
 
+    @Transactional
     public List<EventResponse> getAllEvents() {
-        return eventRepository.findAllByOrderByScheduledAtAsc()
+        return eventRepository
+                .findAllByOrderByScheduledAtAsc()
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    public EventResponse createEvent(CreateEventRequest request) {
+    @Transactional
+    public EventResponse createEvent(
+            CreateEventRequest request
+    ) {
 
         Event event = new Event();
 
         event.setTitle(request.title());
-        event.setImage(request.image());
         event.setDescription(request.description());
         event.setScheduledAt(request.scheduledAt());
 
-        Event savedEvent = eventRepository.save(event);
+        if (request.fileId() != null) {
+            File file =
+                    fileService.getById(request.fileId());
+
+            event.setFile(file);
+        }
+
+        Event savedEvent =
+                eventRepository.save(event);
 
         return toResponse(savedEvent);
     }
@@ -44,43 +59,95 @@ public class EventService {
     ) {
 
         Event event = eventRepository.findById(id)
-                .orElseThrow(EventNotFoundException::new);
+                .orElseThrow(
+                        EventNotFoundException::new
+                );
 
         if (request.title() != null) {
             event.setTitle(request.title());
         }
 
-        if (request.image() != null) {
-            event.setImage(request.image());
+        if (request.fileId() != null) {
+            replaceFile(
+                    event,
+                    request.fileId()
+            );
         }
 
         if (request.description() != null) {
-            event.setDescription(request.description());
+            event.setDescription(
+                    request.description()
+            );
         }
 
         if (request.scheduledAt() != null) {
-            event.setScheduledAt(request.scheduledAt());
+            event.setScheduledAt(
+                    request.scheduledAt()
+            );
         }
 
         return toResponse(event);
     }
 
+    @Transactional
     public void deleteEvent(Long id) {
 
-        boolean exists = eventRepository.existsById(id);
+        Event event = eventRepository.findById(id)
+                .orElseThrow(
+                        EventNotFoundException::new
+                );
 
-        if (!exists) {
-            throw new EventNotFoundException();
+        File file = event.getFile();
+
+        eventRepository.delete(event);
+        eventRepository.flush();
+
+        if (file != null) {
+            fileService.delete(file);
         }
-
-        eventRepository.deleteById(id);
     }
 
-    private EventResponse toResponse(Event event) {
+    private void replaceFile(
+            Event event,
+            Long newFileId
+    ) {
+
+        File oldFile = event.getFile();
+
+        if (oldFile != null
+                && oldFile.getId().equals(newFileId)) {
+            return;
+        }
+
+        File newFile =
+                fileService.getById(newFileId);
+
+        event.setFile(newFile);
+
+        eventRepository.flush();
+
+        if (oldFile != null) {
+            fileService.delete(oldFile);
+        }
+    }
+
+    private EventResponse toResponse(
+            Event event
+    ) {
+
+        String imageUrl = null;
+
+        if (event.getFile() != null) {
+            imageUrl =
+                    "/files/"
+                            + event.getFile().getId()
+                            + "/content";
+        }
+
         return new EventResponse(
                 event.getId(),
                 event.getTitle(),
-                event.getImage(),
+                imageUrl,
                 event.getDescription(),
                 event.getScheduledAt()
         );

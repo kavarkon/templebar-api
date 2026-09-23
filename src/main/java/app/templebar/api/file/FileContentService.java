@@ -11,9 +11,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 
 @Service
 public class FileContentService {
+
+    private static final MediaType WEBP_MEDIA_TYPE =
+            MediaType.parseMediaType("image/webp");
 
     private final FileRepository fileRepository;
     private final Path uploadDirectory;
@@ -23,7 +27,9 @@ public class FileContentService {
             @Value("${storage.upload-directory}") String uploadDirectory
     ) {
         this.fileRepository = fileRepository;
-        this.uploadDirectory = Path.of(uploadDirectory);
+        this.uploadDirectory = Path.of(uploadDirectory)
+                .toAbsolutePath()
+                .normalize();
     }
 
     public FileContentResponse getContent(Long id) throws IOException {
@@ -31,9 +37,14 @@ public class FileContentService {
         File file = fileRepository.findById(id)
                 .orElseThrow(FileNotFoundException::new);
 
-        Path path = uploadDirectory.resolve(file.getPath());
+        Path path = uploadDirectory
+                .resolve(file.getPath())
+                .normalize();
 
-        if (!Files.exists(path)) {
+        if (!path.startsWith(uploadDirectory)
+                || !Files.isRegularFile(path)
+                || !Files.isReadable(path)) {
+
             throw new FileNotFoundException();
         }
 
@@ -45,19 +56,33 @@ public class FileContentService {
             throw new IOException(exception);
         }
 
-        String contentType = Files.probeContentType(path);
-
-        MediaType mediaType;
-
-        if (contentType != null) {
-            mediaType = MediaType.parseMediaType(contentType);
-        } else {
-            mediaType = MediaType.APPLICATION_OCTET_STREAM;
-        }
-
         return new FileContentResponse(
                 resource,
-                mediaType
+                getMediaType(path)
         );
+    }
+
+    private MediaType getMediaType(Path path) {
+
+        String filename = path
+                .getFileName()
+                .toString()
+                .toLowerCase(Locale.ROOT);
+
+        if (filename.endsWith(".jpg")
+                || filename.endsWith(".jpeg")) {
+
+            return MediaType.IMAGE_JPEG;
+        }
+
+        if (filename.endsWith(".png")) {
+            return MediaType.IMAGE_PNG;
+        }
+
+        if (filename.endsWith(".webp")) {
+            return WEBP_MEDIA_TYPE;
+        }
+
+        return MediaType.APPLICATION_OCTET_STREAM;
     }
 }

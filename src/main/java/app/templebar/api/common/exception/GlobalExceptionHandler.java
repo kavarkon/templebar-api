@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.time.OffsetDateTime;
 
@@ -36,6 +37,30 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(
                 "FILE_NOT_FOUND",
                 "File not found",
+                OffsetDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(InvalidFileException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleInvalidFile(
+            InvalidFileException exception
+    ) {
+
+        return new ErrorResponse(
+                "INVALID_FILE",
+                exception.getMessage(),
+                OffsetDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    public ErrorResponse handleMaxUploadSize() {
+
+        return new ErrorResponse(
+                "FILE_TOO_LARGE",
+                "File is too large",
                 OffsetDateTime.now()
         );
     }

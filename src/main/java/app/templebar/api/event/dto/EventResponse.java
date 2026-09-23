@@ -5,7 +5,7 @@ import java.time.OffsetDateTime;
 public record EventResponse(
         Long id,
         String title,
-        String image,
+        String imageUrl,
         String description,
         OffsetDateTime scheduledAt
 ) {

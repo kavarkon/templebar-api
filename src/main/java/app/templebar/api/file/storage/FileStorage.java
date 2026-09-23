@@ -7,4 +7,6 @@ import java.io.IOException;
 public interface FileStorage {
 
     String save(MultipartFile file) throws IOException;
+
+    void delete(String path) throws IOException;
 }

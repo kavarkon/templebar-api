@@ -18,6 +18,10 @@ spring:
 storage:
   upload-directory: ${STORAGE_UPLOAD_DIRECTORY:uploads}
 
+  cleanup:
+    orphan-max-age: ${STORAGE_ORPHAN_MAX_AGE:24h}
+    interval: ${STORAGE_CLEANUP_INTERVAL:1h}
+
 cors:
   allowed-origins:
     - http://localhost:5173

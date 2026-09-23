@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.time.OffsetDateTime;
+
 @Entity
 @Table(name = "file")
 public class File {
@@ -18,6 +20,14 @@ public class File {
     @Column(nullable = false, length = 500)
     private String path;
 
+    @Column(
+            name = "created_at",
+            nullable = false,
+            updatable = false
+    )
+    private OffsetDateTime createdAt =
+            OffsetDateTime.now();
+
     protected File() {
     }
 
@@ -27,6 +37,10 @@ public class File {
 
     public String getPath() {
         return path;
+    }
+
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public void setPath(String path) {

@@ -6,7 +6,7 @@ public record UpdateEventRequest(
 
         String title,
 
-        String image,
+        Long fileId,
 
         String description,
 
