@@ -3,32 +3,19 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-
     image: templebar-api:latest
-
     restart: unless-stopped
-
     env_file:
       - /etc/templebar/api.env
-
     ports:
       - "127.0.0.1:8080:8080"
-
     volumes:
       - /var/lib/templebar/posters:/data/posters
-
     extra_hosts:
-      - "host.docker.internal=host-gateway"
-
+      - "host.docker.internal=172.30.0.1"
     networks:
       - templebar
-
 networks:
   templebar:
     name: templebar-network
-
-    driver: bridge
-
-    ipam:
-      config:
-        - subnet: 172.30.0.0/24
+    external: true
