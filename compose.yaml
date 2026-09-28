@@ -1,9 +1,6 @@
 services:
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: templebar-api:latest
+    image: docker.io/kavarkon/templebar-api:35245f0
     restart: unless-stopped
     env_file:
       - /etc/templebar/api.env
